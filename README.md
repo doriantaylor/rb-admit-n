@@ -14,18 +14,20 @@ detail](https://senseatlas.net/82a04484-0bf1-48e7-8468-6c01be12e314).
 
 # Design
 
-The main thing this microservice needs to do is deal with the outcome
-of a customer making a purchase. All _that_ consists of is enrolling
-one or more e-mail addresses into an access control database, and in
-the base case, forwarding the customer on to where they can enjoy
-their purchase.
+The main thing [this
+microservice](https://senseatlas.net/19b0ccd6-4602-4aa3-a51f-2149080111c8)
+needs to do is deal with the outcome of a customer making a
+purchase. All _that_ consists of is enrolling one or more e-mail
+addresses into an access control database, and in the base case,
+forwarding the customer on to where they can enjoy their purchase.
 
 The catch, here, is one _or more_. One use case I want to be able to
-handle is a manager purchasing a block of audience slots for their
-team. As such, there needs to be UI for the manager to assign slots to
-e-mail addresses. The manager, furthermore, may not be interested in
-the content for themselves, so I don't want to force them to buy an
-extra seat just to manage the other seats they bought.
+handle is [a manager purchasing a block of audience
+slots](https://senseatlas.net/e061cc87-2a85-45dc-bf31-0062fb12b9b2)
+for their team. As such, there needs to be UI for the manager to
+assign slots to e-mail addresses. The manager, furthermore, may not be
+interested in the content for themselves, so I don't want to force
+them to buy an extra seat just to manage the other seats they bought.
 
 So there needs to be an "account manager" role distinct from the
 "audience" who actually gets access to the content, but only as long
@@ -50,9 +52,17 @@ consists of the one resource where the account manager role can
 allocate empty slots. There also needs to be a webhook target for
 receiving payment confirmation asynchronously from Stripe.
 
+## Changes to Authentication/Authorization
+
 This microservice will also be a client to [Forget
 Passwords](https://github.com/doriantaylor/rb-forget-passwords), and
 it will be necessary to modify the latter to be remotely operated.
+
+* enroll user(s)
+* add them to group(s)
+* get a session cookie for a principal (auth bypass)
+
+these just need to be
 
 ## Installation
 

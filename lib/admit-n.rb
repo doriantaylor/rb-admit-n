@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'admit-n/version'
+require 'admit-n/driver/stripe'
 require 'xml/mixup'
 require 'uuid/ncname'
 
@@ -15,10 +16,7 @@ module AdmitN
   class App
     include XML::Mixup
 
-    public
-
-    def initialize
-    end
+    private
 
     # Set up the checkout session and redirect.
     #
@@ -128,6 +126,27 @@ module AdmitN
       # * invalidate the nonce associated with the checkout session
 
       # return 204 no content
+    end
+
+    public
+
+    def initialize
+    end
+
+    def call env
+      # surgery to normalize https
+      if scheme = env['REQUEST_SCHEME']
+        env['HTTPS'] = 'on'.freeze if scheme.strip.downcase == 'https'
+      end
+
+      req  = Rack::Request.new env
+      resp = Rack::Response[404]
+
+      begin
+        # resp =
+      end
+
+      resp
     end
   end
 end

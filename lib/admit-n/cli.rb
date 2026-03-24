@@ -23,6 +23,7 @@ class AdmitN::CLI < Thor
     default: "~/.config/admit-n.conf"
 
   desc 'init', 'Initialize the state database'
+
   def init
   end
 

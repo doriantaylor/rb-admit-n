@@ -1,19 +1,79 @@
 #+STARTUP: showall hidestars indent
-* Preamble
-This QA testing plan is for all the test cases that can't readily be automated.
-* QA Testing Plan
+* Contents
+- Implementation checklist to tally up all the outstanding work to get this shipped.
+- QA checklist for all the test cases that can't readily be automated.
+* Implementation Checklist
+- [ ] The Product
+  - [ ] Video processed into segments
+    - [ ] how about recording the final cut of the video?
+    - [ ] how about editing it?
+  - [ ] Trailer for videos
+    - [ ] how about /writing/ the damn thing?
+    - [ ] how about recording it?
+    - [ ] how about B-roll?
+    - [ ] Upload to YouTube
+      - [ ] Description?
+      - [ ] Title card?
+  - [ ] Player page
+- [ ] Assets online and serving
+  - [ ] ~media.methodandstructure.com~ configured
+    - [ ] Server config
+    - [ ] SSL certificate?
+  - [ ] ~hls.js~ figured out
+  - [ ] Subtitles?
+- [ ] Interfaces designed
+  - [ ] Marketing page CTA
+  - [ ] "You're already in" pre-checkout interstitial
+  - [ ] Seat assignment/conformation
+  - [ ] "Hero" error messages (ie those that a user could conceivably encounter in normal flow)
+    - [ ] 503/504 can't connect/timeout to upstream service
+- [-] Changes to ~forget-passwords~
+  - [ ] ~/me~ resource when logged in
+  - [ ] "is ~$PRINCIPAL~ enrolled?" resource
+  - [X] "add ~@PRINCIPALS~ to auth list" resource
+  - [X] "bypass auth and get cookie for ~$PRINCIPAL~" resource
+- [-] ~admit-n~ gem installed
+  - [ ] Gem pushed to ~rubygems.org~
+    - [ ] Updated gemspec
+    - [ ] Minimal unit test skeleton
+  - [-] Code written
+    - [ ] Configuration/data hygiene
+      - [ ] Configuration parser
+      - [ ] Type coercions
+    - [-] Database adapter
+      - [-] ORM
+        - [X] harness/class generators
+        - [ ] data type inflation/deflation methods
+      - [X] database creation
+      - [-] platform-specific tailoring
+        - [X] Postgres
+        - [ ] SQLite
+        - [ ] MySQL
+    - [ ] CLI
+      - [ ] install database
+      - [ ] add product
+      - [ ] list customers
+      - [ ] run daemon
+    - [ ] Web
+      - [ ] CTA → payment processor redirector
+        - [ ] "you're already in" case handler
+      - [ ] Post-checkout landing → seat assignment
+        - [ ] ~GET~ (form UI)
+        - [ ] ~POST~ (mutator)
+      - [ ] Web hook/asynchronous event target
+* QA Testing Checklist
 - Initial CTA
   - [ ] Unlisted email is redirected directly to Stripe page.
   - [ ] Stripe checkout session is seeded with recovery link.
     - [ ] E-mailed receipt has link to landing URL (with nonce, checkout ID).
 - "You're already in"
   - [ ] Listed email passes through "you're already in" page.
-  - [ ] Form gives options to either "Send Sign-In Link" or "Purchase Passes for Others"
-    - [ ] (Unless the person is already logged in, then "Send Sign-in Link" should be "Proceed to Lectures")
+  - [ ] Form gives options to either "Send Sign-In Link" or "Purchase Passes for Others".
+    - [ ] (Unless the person is already logged in, then "Send Sign-in Link" should be "Proceed to Lectures").
 - Post-Payment Landing Resource (Redirect)
-  - [ ] Completing a payment (at Stripe) redirects back to landing URL
+  - [ ] Completing a payment (at Stripe) redirects back to landing URL.
   - [ ] Landing resource checks with Stripe to confirm payment (if Web hook has not already been received)
-    - [ ] Landing resource retrieves session cookie from auth handler and forwards to client
+    - [ ] Landing resource retrieves session cookie from auth handler and forwards to client.
     - [ ] Landing resource redirects to seat assignment/confirmation page.
   - [ ] Landing resource errors out appropriately:
     - [ ] 503 for can't verify stripe, fetch cookie, or contact the database.
@@ -29,4 +89,4 @@ This QA testing plan is for all the test cases that can't readily be automated.
   - [ ] The UI should warn when you attempt to assign a seat to somebody who already has one through some other means.
   - [ ] ~POST~-ing to "Confirm" should redirect you onward to the designated content URL.
 - Content "Lobby"
-  - there is only one video
+  - [ ] There is only one video to start with, so we can go straight to it.

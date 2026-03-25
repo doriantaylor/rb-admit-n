@@ -17,9 +17,11 @@ detail](https://senseatlas.net/82a04484-0bf1-48e7-8468-6c01be12e314).
 The main thing [this
 microservice](https://senseatlas.net/19b0ccd6-4602-4aa3-a51f-2149080111c8)
 needs to do is deal with the outcome of a customer making a
-purchase. All _that_ consists of is enrolling one or more e-mail
-addresses into an access control database, and in the base case,
-forwarding the customer on to where they can enjoy their purchase.
+purchase. All _that_ consists of is confirming the payment, then
+enrolling one or more e-mail addresses into an access control
+database. In the base case (where the customer bought a seat for
+themselves), it should also forward the customer on to where they can
+enjoy their purchase.
 
 The catch, here, is one _or more_. One use case I want to be able to
 handle is [a manager purchasing a block of audience

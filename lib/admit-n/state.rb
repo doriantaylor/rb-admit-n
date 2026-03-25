@@ -62,11 +62,12 @@ class AdmitN::State
       gen.class.instance_exec do
         # proper uuid type
         define_method :UUID do |name, opts=OPTS|
-          column name, :uuid, opts
+          column name, :uuid,
+            { default: Sequel.function(:gen_random_uuid) }.merge(opts)
         end
 
         define_method :Money do |name, opts=OPTS|
-          column name, :integer, opts
+          column name, Integer, opts
         end
 
         define_method :Currency do |name, opts=OPTS|
@@ -158,7 +159,7 @@ class AdmitN::State
       },
       create: -> {
         # our identifier
-        UUID :id, primary_key: { name: :pk_product }
+        UUID :id, null: false, primary_key: { name: :pk_product }
         # remote identifier
         String :remote_id, null: false, text: true
         # text description
@@ -169,6 +170,8 @@ class AdmitN::State
         Currency :currency, null: false, default: 'USD'
         # added on
         Time :added, null: false, default: S::CURRENT_TIMESTAMP
+
+        constraint(:ck_product_currency) { currency =~ trim(upper(currency)) }
       },
     },
     customer: {
@@ -177,7 +180,7 @@ class AdmitN::State
       },
       create: -> {
         # our identifier
-        UUID :id, primary_key: { name: :pk_customer }
+        UUID :id, null: false, primary_key: { name: :pk_customer }
         # remote identifier
         String :remote_id, null: false, text: true
         # email
@@ -186,19 +189,37 @@ class AdmitN::State
         Time :added, null: false, default: S::CURRENT_TIMESTAMP
       },
     },
+    event_log: {
+      # i dunno, we could probably infer this lol
+      class: %i[Event Log],
+      model: -> {
+        # is there anything in here??
+      },
+      create: -> {
+        # our identifier
+        UUID :id, null: false, primary_key: { name: :pk_event_log }
+        # recorded on
+        Time :logged, null: false, default: S::CURRENT_TIMESTAMP
+        # passive (is webhook?)
+        # message type
+        # message (jsonb)
+        JSON :message, null: false
+      },
+    },
     purchase: {
       model: -> {
+        one_to_one  :event_log
         many_to_one :product
         many_to_one :customer
         one_to_many :assignment
       },
       create: -> {
         # our identifier
-        UUID :id, primary_key: { name: :pk_purchase }
+        UUID :id, null: false, default: nil, primary_key: { name: :pk_purchase }
         # customer
-        UUID :customer, null: false
+        UUID :customer, null: false, default: nil
         # product
-        UUID :product, null: false
+        UUID :product, null: false, default: nil
         # quantity
         Integer :quantity, null: false, default: 1
         # remote identifier
@@ -208,8 +229,11 @@ class AdmitN::State
         # logged at
         Time :logged, null: false, default: S::CURRENT_TIMESTAMP
 
-        foreign_key %i[customer], :customer, name: :fk_purchase_customer
-        foreign_key %i[product],  :product,  name: :fk_purchase_product
+        constraint(:ck_purchase_quantity) { quantity > 0 }
+
+        foreign_key %i[id],       :event_log, name: :fk_purchase_event
+        foreign_key %i[customer], :customer,  name: :fk_purchase_customer
+        foreign_key %i[product],  :product,   name: :fk_purchase_product
       },
     },
     assignment: {
@@ -218,7 +242,7 @@ class AdmitN::State
       },
       create: -> {
         # purchase
-        UUID :purchase, null: false
+        UUID :purchase, null: false, default: nil
         # email
         String :email, null: false, text: true
         # assigned at
@@ -227,23 +251,6 @@ class AdmitN::State
         primary_key %i[purchase email], name: :pk_assignment
       },
     },
-    stripe_log: {
-      # i dunno, we could probably infer this lol
-      class: %i[Stripe Log],
-      model: -> {
-        # is there anything in here??
-      },
-      create: -> {
-        # our identifier
-        UUID :id, null: false
-        # recorded on
-        Time :logged, null: false, default: S::CURRENT_TIMESTAMP
-        # passive (is webhook?)
-        # message type
-        # message (jsonb)
-        JSON :message, null: false
-      },
-    }
   }
 
   # Create the tables in the database.

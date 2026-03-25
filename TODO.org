@@ -1,0 +1,32 @@
+#+STARTUP: showall hidestars indent
+* Preamble
+This QA testing plan is for all the test cases that can't readily be automated.
+* QA Testing Plan
+- Initial CTA
+  - [ ] Unlisted email is redirected directly to Stripe page.
+  - [ ] Stripe checkout session is seeded with recovery link.
+    - [ ] E-mailed receipt has link to landing URL (with nonce, checkout ID).
+- "You're already in"
+  - [ ] Listed email passes through "you're already in" page.
+  - [ ] Form gives options to either "Send Sign-In Link" or "Purchase Passes for Others"
+    - [ ] (Unless the person is already logged in, then "Send Sign-in Link" should be "Proceed to Lectures")
+- Post-Payment Landing Resource (Redirect)
+  - [ ] Completing a payment (at Stripe) redirects back to landing URL
+  - [ ] Landing resource checks with Stripe to confirm payment (if Web hook has not already been received)
+    - [ ] Landing resource retrieves session cookie from auth handler and forwards to client
+    - [ ] Landing resource redirects to seat assignment/confirmation page.
+  - [ ] Landing resource errors out appropriately:
+    - [ ] 503 for can't verify stripe, fetch cookie, or contact the database.
+      - [ ] 500 for database errors besides.
+    - [ ] 409 for missing parameters.
+    - [ ] 405 for requests other than ~GET~ (it is a redirect target).
+- Seat assignment/confirmation resource
+  - [ ] Seat assignment/confirmation resource is pre-populated with customwer email…
+    - [ ] …unless the customer is already assigned a seat by somebody else, then leave blank.
+  - [ ] If two or more slots are available, customer can assign a delegate to assign the rest of the seats.
+    - [ ] (We are currently requiring delegates to also be seat assignees.)
+  - [ ] The UI shouldn't let you assign the same email address to more than one slot.
+  - [ ] The UI should warn when you attempt to assign a seat to somebody who already has one through some other means.
+  - [ ] ~POST~-ing to "Confirm" should redirect you onward to the designated content URL.
+- Content "Lobby"
+  - there is only one video

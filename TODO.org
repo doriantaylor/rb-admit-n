@@ -24,9 +24,10 @@
 - [ ] Interfaces designed
   - [ ] Marketing page CTA
   - [ ] "You're already in" pre-checkout interstitial
-  - [ ] Seat assignment/conformation
-  - [ ] "Hero" error messages (ie those that a user could conceivably encounter in normal flow)
+  - [ ] Seat assignment/confirmation UI
+  - [ ] "Hero" error messages (ie those that a user could conceivably encounter in a normal flow)
     - [ ] 503/504 can't connect/timeout to upstream service
+    - [ ] 409 for bad form input (maybe? if not handled by JS)
 - [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][forget-passwords]]
   - [ ] ~/me~ resource when logged in
   - [ ] "is ~$PRINCIPAL~ enrolled?" resource

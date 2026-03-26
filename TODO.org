@@ -43,8 +43,15 @@
       - [ ] Configuration file
         - DSN
         - listen host/port
+        - JWT key (to interface with ~forget-passwords~ over HTTP)
         - URLs
-          - initial target
+          - CTA redirect (Stripe URL is automatically computed)
+          - "You're already in" interstitial
+          - Landing redirect
+            - Landing redirect /target/ (defaults to assign/confirm)
+          - Assignment/confirmation
+            - after-confirmation redirect target (eg "content lobby" which is outside this module)
+          - Web hook
     - [-] Database adapter
       - [-] ORM
         - [X] harness/class generators
@@ -67,7 +74,7 @@
         - [ ] ~POST~ (mutator)
       - [ ] Web hook/asynchronous event target
 * QA Testing Checklist
-- Initial CTA
+- Initial CTA (redirect; no content)
   - [ ] Unlisted email is redirected directly to Stripe page.
   - [ ] Stripe checkout session is seeded with recovery link.
     - [ ] E-mailed receipt has link to landing URL (with nonce, checkout ID).
@@ -75,7 +82,7 @@
   - [ ] Listed email passes through "you're already in" page.
   - [ ] Form gives options to either "Send Sign-In Link" or "Purchase Passes for Others".
     - [ ] (Unless the person is already logged in, then "Send Sign-in Link" should be "Proceed to Lectures").
-- Post-Payment Landing Resource (Redirect)
+- Post-payment landing resource (redirect; no content)
   - [ ] Completing a payment (at Stripe) redirects back to landing URL.
   - [ ] Landing resource checks with Stripe to confirm payment (if Web hook has not already been received)
     - [ ] Landing resource retrieves session cookie from auth handler and forwards to client.
@@ -90,9 +97,12 @@
     - [ ] …unless the customer is already assigned a seat by somebody else, then leave it blank.
   - [ ] If the customer is already enrolled (e.g. assigned by another customer or comped by me), the UI should reflect that.
   - [ ] If two or more slots are available, customer can assign a delegate to assign the rest of the seats.
-    - [ ] (We are currently requiring delegates to also be seat assignees.)
+    - [ ] If a delegate is already enrolled, they should not take up a slot.
   - [ ] The UI shouldn't let you assign the same email address to more than one slot.
   - [ ] The UI should warn when you attempt to assign a seat to somebody who already has one through some other means.
   - [ ] ~POST~-ing to "Confirm" should redirect you onward to the designated content URL.
-- Content "Lobby"
+- Web hook (this is actually automatable; returns status codes only, no content)
+  - [ ] processes completed checkouts
+  - [ ] processes expired checkouts
+- Content "lobby"
   - [ ] There is only one video to start with, so we can go straight to it.

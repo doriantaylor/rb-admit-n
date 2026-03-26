@@ -20,14 +20,14 @@
   - [ ] ~media.methodandstructure.com~ configured
     - [ ] Server config
     - [ ] SSL certificate?
-  - [ ] [[https://github.com/video-dev/hls.js/][~hls.js~]] figured out
+  - [ ] [[https://github.com/video-dev/hls.js/][hls.js]] figured out
 - [ ] Interfaces designed
   - [ ] Marketing page CTA
   - [ ] "You're already in" pre-checkout interstitial
   - [ ] Seat assignment/conformation
   - [ ] "Hero" error messages (ie those that a user could conceivably encounter in normal flow)
     - [ ] 503/504 can't connect/timeout to upstream service
-- [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][~forget-passwords~]]
+- [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][forget-passwords]]
   - [ ] ~/me~ resource when logged in
   - [ ] "is ~$PRINCIPAL~ enrolled?" resource
   - [X] "add ~@PRINCIPALS~ to auth list" resource
@@ -38,8 +38,13 @@
     - [ ] Minimal unit test skeleton
   - [-] Code written
     - [ ] Configuration/data hygiene
-      - [ ] Configuration parser
       - [ ] Type coercions
+      - [ ] Configuration parser
+      - [ ] Configuration file
+        - DSN
+        - listen host/port
+        - URLs
+          - initial target
     - [-] Database adapter
       - [-] ORM
         - [X] harness/class generators
@@ -81,8 +86,9 @@
     - [ ] 409 for missing parameters.
     - [ ] 405 for requests other than ~GET~ (it is a redirect target).
 - Seat assignment/confirmation resource
-  - [ ] Seat assignment/confirmation resource is pre-populated with customwer email…
-    - [ ] …unless the customer is already assigned a seat by somebody else, then leave blank.
+  - [ ] Seat assignment/confirmation resource is pre-populated with customer email…
+    - [ ] …unless the customer is already assigned a seat by somebody else, then leave it blank.
+  - [ ] If the customer is already enrolled (e.g. assigned by another customer or comped by me), the UI should reflect that.
   - [ ] If two or more slots are available, customer can assign a delegate to assign the rest of the seats.
     - [ ] (We are currently requiring delegates to also be seat assignees.)
   - [ ] The UI shouldn't let you assign the same email address to more than one slot.

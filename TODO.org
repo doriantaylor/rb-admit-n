@@ -7,6 +7,7 @@
   - [ ] Video processed into segments
     - [ ] how about recording the final cut of the video?
     - [ ] how about editing it?
+    - [ ] Subtitles?
   - [ ] Trailer for videos
     - [ ] how about /writing/ the damn thing?
     - [ ] how about recording it?
@@ -19,15 +20,14 @@
   - [ ] ~media.methodandstructure.com~ configured
     - [ ] Server config
     - [ ] SSL certificate?
-  - [ ] ~hls.js~ figured out
-  - [ ] Subtitles?
+  - [ ] [[https://github.com/video-dev/hls.js/][~hls.js~]] figured out
 - [ ] Interfaces designed
   - [ ] Marketing page CTA
   - [ ] "You're already in" pre-checkout interstitial
   - [ ] Seat assignment/conformation
   - [ ] "Hero" error messages (ie those that a user could conceivably encounter in normal flow)
     - [ ] 503/504 can't connect/timeout to upstream service
-- [-] Changes to ~forget-passwords~
+- [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][~forget-passwords~]]
   - [ ] ~/me~ resource when logged in
   - [ ] "is ~$PRINCIPAL~ enrolled?" resource
   - [X] "add ~@PRINCIPALS~ to auth list" resource

@@ -42,31 +42,33 @@
       - [ ] Type coercions
       - [ ] Configuration parser
       - [ ] Configuration file
-        - DSN
-        - listen host/port
+        - Data source name
+        - Daemon host/port
         - JWT key (to interface with ~forget-passwords~ over HTTP)
         - URLs
-          - CTA redirect (Stripe URL is automatically computed)
+          - CTA redirect (Stripe checkout URL is automatically computed)
           - "You're already in" interstitial
           - Landing redirect
             - Landing redirect /target/ (defaults to assign/confirm)
           - Assignment/confirmation
             - after-confirmation redirect target (eg "content lobby" which is outside this module)
           - Web hook
+        - [ ] Anything else?
     - [-] Database adapter
       - [-] ORM
         - [X] harness/class generators
         - [ ] data type inflation/deflation methods
       - [X] database creation
-      - [-] platform-specific tailoring
+      - [-] Product-specific tailoring
         - [X] Postgres
         - [ ] SQLite
         - [ ] MySQL
     - [ ] CLI
-      - [ ] install database
-      - [ ] add product
-      - [ ] list customers
-      - [ ] run daemon
+      - [ ] Install database
+      - [ ] Add product
+      - [ ] List customers
+      - [ ] Run daemon (default)
+        - [ ] Initialize database if not already
     - [ ] Web
       - [ ] CTA → payment processor redirector
         - [ ] "you're already in" case handler
@@ -74,6 +76,23 @@
         - [ ] ~GET~ (form UI)
         - [ ] ~POST~ (mutator)
       - [ ] Web hook/asynchronous event target
+* Work Cells
+1. [ ] Rough in the "happy path"
+   - [ ] web hook
+   - [ ] initial redirect to stripe
+   - [ ] landing redirect
+2. [ ] second pass
+   - [ ] assign seats and confirm
+   - [ ] "you're in" page
+3. [ ] final cut of video
+   - [ ] last slides
+   - [ ] shoot
+   - [ ] cut
+4. [ ] trailer
+   - [ ] write
+   - [ ] shoot
+5. [ ] trailer b-roll, cut
+6. [ ] put online
 * QA Testing Checklist
 - Initial CTA (redirect; no content)
   - [ ] Unlisted email is redirected directly to Stripe page.

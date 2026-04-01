@@ -77,22 +77,24 @@
         - [ ] ~POST~ (mutator)
       - [ ] Web hook/asynchronous event target
 * Work Cells
-1. [ ] Rough in the "happy path"
+1. [ ] configuration structure
+   - this took six unexpected hours of fixing indentation in the code editor
+2. [ ] Rough in the "happy path"
+   - [ ] bootstrap from CLI
    - [ ] web hook
    - [ ] initial redirect to stripe
    - [ ] landing redirect
-2. [ ] second pass
-   - [ ] assign seats and confirm
-   - [ ] "you're in" page
-3. [ ] final cut of video
+3. [ ] assign seats and confirm
+4. [ ] "you're already in" page
+5. [ ] final cut of video
    - [ ] last slides
    - [ ] shoot
    - [ ] cut
-4. [ ] trailer
+6. [ ] trailer
    - [ ] write
    - [ ] shoot
-5. [ ] trailer b-roll, cut
-6. [ ] put online
+7. [ ] trailer b-roll, cut
+8. [ ] put online
 * QA Testing Checklist
 - Initial CTA (redirect; no content)
   - [ ] Unlisted email is redirected directly to Stripe page.

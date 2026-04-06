@@ -30,6 +30,9 @@
     - [ ] 409 for bad form input (maybe? if not handled by JS)
 - [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][forget-passwords]]
   - [ ] ~/me~ resource when logged in
+    - [ ] (X)HTML variant
+    - [ ] JSON(-LD) variant
+    - [ ] returns 401 if not logged in
   - [ ] "is ~$PRINCIPAL~ enrolled?" resource
   - [X] "add ~@PRINCIPALS~ to auth list" resource
   - [X] "bypass auth and get cookie for ~$PRINCIPAL~" resource
@@ -77,24 +80,29 @@
         - [ ] ~POST~ (mutator)
       - [ ] Web hook/asynchronous event target
 * Work Cells
-1. [ ] configuration structure
-   - this took six unexpected hours of fixing indentation in the code editor
-2. [ ] Rough in the "happy path"
-   - [ ] bootstrap from CLI
+1. [X] configuration structure
+   - this took six unexpected hours of fiddledicking with indentation macros because something changed out from underneath me
+     - also spurred the setting up of rubocop
+   - also reminded me why I elected to monkeypatch ~Dry::Types~ instead of trying to use ~Dry::Schema~
+2. [ ] finish changes to ~forget-passwords~
+   - [ ] ~/me~ resource that echoes back ~REMOTE_USER~ if present
+   - [ ] resource for querying if a principal is enrolled
+3. [-] Rough in the "happy path"
+   - [X] bootstrap from CLI with config file
    - [ ] web hook
    - [ ] initial redirect to stripe
    - [ ] landing redirect
-3. [ ] assign seats and confirm
-4. [ ] "you're already in" page
-5. [ ] final cut of video
+4. [ ] assign seats and confirm
+5. [ ] "you're already in" page
+6. [ ] final cut of video
    - [ ] last slides
    - [ ] shoot
    - [ ] cut
-6. [ ] trailer
+7. [ ] trailer
    - [ ] write
    - [ ] shoot
-7. [ ] trailer b-roll, cut
-8. [ ] put online
+8. [ ] trailer b-roll, cut
+9. [ ] put online
 * QA Testing Checklist
 - Initial CTA (redirect; no content)
   - [ ] Unlisted email is redirected directly to Stripe page.

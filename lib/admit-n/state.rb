@@ -253,28 +253,6 @@ class AdmitN::State
     },
   }
 
-  # Create the tables in the database.
-  #
-  def create_tables force: false
-    # we want our types so the create statements actually work
-    inject_types! if respond_to? :inject_types!, true
-
-    # anyway…
-    method  = 'create_table' + (force ? ?! : ??)
-    cascade = force and db.adapter_scheme != :sqlite
-
-    TABLES.keys.each do |table|
-      proc = TABLES[table][:create]
-      db.drop_table table, cascade: cascade if force and db.table_exists?(table)
-      db.send method, table, &proc
-    end
-
-    # add any triggers to the database
-    create_triggers! if respond_to? :create_triggers!, true
-
-    true
-  end
-
   # Generate the {Sequel::Model} classes associated with their
   # respective datasets. Optionally (re)create the tables.
   #
@@ -284,7 +262,7 @@ class AdmitN::State
   #
   def first_run! force: false
     # only run this if forced or not all the tables are present
-    create_tables force: force if force || !(TABLES.keys - db.tables).empty?
+    create_tables force: force if !inititalized? || force
 
     me = root = self.class
 
@@ -342,6 +320,37 @@ class AdmitN::State
     self.class.include mod
 
     first_run! force: force if create
+  end
+
+  def initialized?
+    # if this is empty then the db has the tables
+    (TABLES.keys - db.tables).empty?
+  end
+
+  # Create the tables in the database.
+  #
+  # @param force [false, true]
+  #
+  # @return [void]
+  #
+  def create_tables force: false
+    # we want our types so the create statements actually work
+    inject_types! if respond_to? :inject_types!, true
+
+    # anyway…
+    method  = 'create_table' + (force ? ?! : ??)
+    cascade = force and db.adapter_scheme != :sqlite
+
+    TABLES.keys.each do |table|
+      proc = TABLES[table][:create]
+      db.drop_table table, cascade: cascade if force and db.table_exists?(table)
+      db.send method, table, &proc
+    end
+
+    # add any triggers to the database
+    create_triggers! if respond_to? :create_triggers!, true
+
+    true
   end
 
   # Return a less-cluttered representation of the object.

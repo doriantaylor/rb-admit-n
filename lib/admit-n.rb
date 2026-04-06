@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
-require 'admit-n/version'
+require 'admit-n/types'
+require 'admit-n/state'
 require 'admit-n/driver/stripe'
 require 'xml/mixup'
 require 'uuid/ncname'
 
 # Admit-_N_ performs order fulfillment for one-off payments for access
 # to gated content, where the customer can buy access for themselves
-# and/or any number of others.
+# and/or any number of others. "Order fulfillment", in this case,
+# refers to enrolling a certain number of seats
 #
 module AdmitN
 
@@ -130,13 +132,34 @@ module AdmitN
 
     public
 
-    def initialize
+    attr_reader :state
+
+    # Initialize the app.
+    #
+    # @param state [AdmitN::State, #to_s]
+    # @param jwt [String]
+    # @param endpoints [Hash<Symbol, String>]
+    # @param urls [Hash<Symbol, String>]
+    #
+    # @return [void]
+    #
+    def initialize state, jwt: nil, endpoints: {},
+        urls: AdmitN::Types::URLConfig.value
+      @state     = state.is_a?(AdmitN::State) ? state : AdmitN::State.new(state)
+      @endpoints = endpoints
+      @urls      = urls
     end
 
+    # Call the app through the {Rack} interface.
+    #
+    # @param env [Hash] the Rack environment
+    #
+    # @return [Array] the noramlized Rack response
+    #
     def call env
       # surgery to normalize https
       if scheme = env['REQUEST_SCHEME']
-        env['HTTPS'] = 'on'.freeze if scheme.strip.downcase == 'https'
+        env['HTTPS'] = 'on' if scheme.strip.downcase == 'https'
       end
 
       req  = Rack::Request.new env
@@ -146,7 +169,7 @@ module AdmitN
         # resp =
       end
 
-      resp
+      resp.finalize
     end
   end
 end

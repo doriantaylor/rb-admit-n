@@ -4,12 +4,13 @@ require_relative 'version'
 require 'dry-schema'
 require 'uuidtools'
 require 'pathname'
+require 'uri'
 
 # monkey-patch copied almost verbatim from `forget-passwords`
 module Dry::Types::Builder
   unless method_defined? :hash_default
     def hash_default
-      # obtain all the required keys from the spec
+      # obtain all the required keys from thevqq spec
       reqd = keys.select(&:required?)
 
       if reqd.empty?
@@ -63,6 +64,10 @@ module AdmitN::Types
     UUIDTools::UUID.parse m.captures.first
   end
 
+  URI = Instance(::URI::Generic).constructor do |x|
+    Kernel.URI x
+  end
+
   # json type (is there one already?) which has to union all the primitives
   # JSONb = JSON::Nil | JSON::
   # JSONb = Types::Constructor
@@ -79,6 +84,21 @@ module AdmitN::Types
   # apparently you can't go from schema to map
   SymbolMap = Hash.map NormSym, Any
 
+  JWTConfig = SymbolHash.schema({
+    secret: Coercible::String.constrained(min_size: 1),
+  }).hash_default
+
+  EndpointConfig = SymbolHash.schema({
+    test:   URI,
+    bypass: URI,
+    enroll: URI,
+  })
+
+  ClientConfig = SymbolHash.schema({
+    secret:    Coercible::String.constrained(min_size: 1),
+    endpoints: EndpointConfig,
+  })
+
   URLConfig = SymbolHash.schema({
     initial_cta:    '/buy_now',
     already_in:     '/existing-customer',
@@ -88,10 +108,10 @@ module AdmitN::Types
   }.transform_values { |x| Coercible::String.default x.freeze }).hash_default
 
   Config = SymbolHash.schema({
-    dsn:        DSN,
-    host?:      Hostname.default('localhost'),
-    port?:      Coercible::Integer.default(10105),
-    jwt_secret: Coercible::String.constrained(min_size: 1),
-    urls:       URLConfig,
+    dsn:   DSN,
+    host?: Hostname.default('localhost'),
+    port?: Coercible::Integer.default(10105),
+    jwt:   JWTConfig,
+    urls:  URLConfig,
   }).hash_default
 end

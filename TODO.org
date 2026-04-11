@@ -28,23 +28,24 @@
   - [ ] "Hero" error messages (ie those that a user could conceivably encounter in a normal flow)
     - [ ] 503/504 can't connect/timeout to upstream service
     - [ ] 409 for bad form input (maybe? if not handled by JS)
-- [-] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][forget-passwords]]
-  - [ ] ~/me~ resource when logged in
-    - [ ] (X)HTML variant
-    - [ ] JSON(-LD) variant
-    - [ ] returns 401 if not logged in
-  - [ ] "is ~$PRINCIPAL~ enrolled?" resource
+- [X] Changes to [[https://github.com/doriantaylor/rb-forget-passwords][forget-passwords]]
+  - [X] ~/me~ resource when logged in
+    - [X] (X)HTML variant
+    - [X] JSON(-LD) variant
+    - [X] returns 401 if not logged in
+  - [X] "is ~$PRINCIPAL~ enrolled?" resource
   - [X] "add ~@PRINCIPALS~ to auth list" resource
   - [X] "bypass auth and get cookie for ~$PRINCIPAL~" resource
+    - (enroll the principal if not already enrolled)
 - [-] ~admit-n~ gem installed
-  - [ ] Gem pushed to ~rubygems.org~
-    - [ ] Updated gemspec
+  - [-] Gem pushed to ~rubygems.org~
+    - [X] Updated gemspec
     - [ ] Minimal unit test skeleton
   - [-] Code written
     - [ ] Configuration/data hygiene
       - [ ] Type coercions
       - [ ] Configuration parser
-      - [ ] Configuration file
+      - [ ] Configuration file interface
         - Data source name
         - Daemon host/port
         - JWT key (to interface with ~forget-passwords~ over HTTP)
@@ -56,6 +57,7 @@
           - Assignment/confirmation
             - after-confirmation redirect target (eg "content lobby" which is outside this module)
           - Web hook
+        - [ ] Stripe credentials
         - [ ] Anything else?
     - [-] Database adapter
       - [-] ORM
@@ -66,12 +68,13 @@
         - [X] Postgres
         - [ ] SQLite
         - [ ] MySQL
-    - [ ] CLI
-      - [ ] Install database
+    - [X] CLI
+      - [X] Install configuration file
+    - [-] Install database
       - [ ] Add product
       - [ ] List customers
-      - [ ] Run daemon (default)
-        - [ ] Initialize database if not already
+      - [X] Run daemon (default)
+        - Initialize database if not already
     - [ ] Web
       - [ ] CTA → payment processor redirector
         - [ ] "you're already in" case handler
@@ -84,11 +87,17 @@
    - this took six unexpected hours of fiddledicking with indentation macros because something changed out from underneath me
      - also spurred the setting up of rubocop
    - also reminded me why I elected to monkeypatch ~Dry::Types~ instead of trying to use ~Dry::Schema~
-2. [ ] finish changes to ~forget-passwords~
-   - [ ] ~/me~ resource that echoes back ~REMOTE_USER~ if present
-   - [ ] resource for querying if a principal is enrolled
+2. [X] finish changes to ~forget-passwords~
+   - [X] ~/me~ resource that echoes back ~REMOTE_USER~ if present
+   - [X] resource for querying if a principal is enrolled
+   - [X] resource for bulk enrollments
+   - [X] resource for bypassing auth and fetching session cookie
+     - enroll principal if not already enrolled
 3. [-] Rough in the "happy path"
    - [X] bootstrap from CLI with config file
+     - [X] CLI prompt for non-defaultable parameters
+     - [X] write config file to target
+     - [X] initialize database
    - [ ] web hook
    - [ ] initial redirect to stripe
    - [ ] landing redirect

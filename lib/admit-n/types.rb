@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'version'
-require 'dry-schema'
+# require 'dry-schema' # we don't actually use this
+require 'dry-types'
 require 'uuidtools'
 require 'pathname'
 require 'uri'
@@ -107,11 +108,18 @@ module AdmitN::Types
     webhook:        '/handle-events',
   }.transform_values { |x| Coercible::String.default x.freeze }).hash_default
 
+  StripeConfig = SymbolHash.schema({
+    api_secret: Coercible::String.constrained(format: /^sk_/),
+    wh_secret:  Coercible::String.constrained(format: /^wh_/),
+    product:    Coercible::String.consttrained(format: /^pr_/),
+  })
+
   Config = SymbolHash.schema({
-    dsn:   DSN,
-    host?: Hostname.default('localhost'),
-    port?: Coercible::Integer.default(10105),
-    jwt:   JWTConfig,
-    urls:  URLConfig,
+    dsn:    DSN,
+    host?:  Hostname.default('localhost'),
+    port?:  Coercible::Integer.default(10105),
+    jwt:    JWTConfig,
+    urls:   URLConfig,
+    stripe: StripeConfig,
   }).hash_default
 end

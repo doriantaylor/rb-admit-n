@@ -4,7 +4,7 @@ require 'admit-n/types'
 require 'admit-n/state'
 require 'admit-n/driver/stripe'
 require 'xml/mixup'
-require 'uuid/ncname'
+# require 'uuid/ncname'
 
 # Admit-_N_ performs order fulfillment for one-off payments for access
 # to gated content, where the customer can buy access for themselves

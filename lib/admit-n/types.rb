@@ -87,7 +87,7 @@ module AdmitN::Types
 
   JWTConfig = SymbolHash.schema({
     secret: Coercible::String.constrained(min_size: 1),
-  }).hash_default
+  })
 
   EndpointConfig = SymbolHash.schema({
     test:   URI,
@@ -105,13 +105,13 @@ module AdmitN::Types
     already_in:     '/existing-customer',
     post_checkout:  '/fulfill-order',
     assign_confirm: '/assign-seats',
-    webhook:        '/handle-events',
-  }.transform_values { |x| Coercible::String.default x.freeze }).hash_default
+    webhook:        '/checkout-events',
+  }.transform_values { |x| Coercible::String.default x }).hash_default
 
   StripeConfig = SymbolHash.schema({
     api_secret: Coercible::String.constrained(format: /^sk_/),
-    wh_secret:  Coercible::String.constrained(format: /^wh_/),
-    product:    Coercible::String.consttrained(format: /^pr_/),
+    wh_secret:  Coercible::String.constrained(format: /^whsec_/),
+    product:    Coercible::String.constrained(format: /^pr_/),
   })
 
   Config = SymbolHash.schema({

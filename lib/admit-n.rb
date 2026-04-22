@@ -4,7 +4,11 @@ require 'admit-n/types'
 require 'admit-n/state'
 require 'admit-n/driver/stripe'
 require 'xml/mixup'
-# require 'uuid/ncname'
+require 'uuid/ncname'
+
+require 'rack/request'
+require 'rack/response'
+
 
 # Admit-_N_ performs order fulfillment for one-off payments for access
 # to gated content, where the customer can buy access for themselves
@@ -12,6 +16,74 @@ require 'xml/mixup'
 # refers to enrolling a certain number of seats
 #
 module AdmitN
+
+  # An error response (with status, headers, etc) that can be raised
+  # and caught.
+  class ErrorResponse < RuntimeError
+
+    attr_reader :response
+
+    # Create a new error response.
+    #
+    # @param body [#to_s, #each] the response body
+    # @param status [Integer] the HTTP status code
+    # @param headers [Hash] the header set
+    #
+    def initialize body = nil, status = 500, headers = {}
+      if body.is_a? Rack::Response
+        @response = body
+      else
+        @response = Rack::Response.new body, status, headers
+      end
+    end
+
+    # Returns the error message (which is the response body).
+    #
+    # @return [String] the error message (response body)
+    #
+    def message
+      @response.body
+    end
+
+    # Sets a new error message (response body). Does not change
+    # anything else, like headers or status or anything.
+    #
+    # @param msg [#to_s] the new error message
+    #
+    def message= msg
+      # XXX this is actually wrong and will crash
+      @response.body = msg.to_s
+    end
+
+    # Generate a new exception with a Rack::Response as a message.
+    # Otherwise creates a new error response.
+    #
+    # @param message [Rack::Response, #to_s] the response object or string
+    #
+    # @return [ForgetPasswords::ErrorResponse] a new error response
+    #
+    def self.exception message
+      # XXX TODO auto generate (x)html from text message?
+      case message
+      when Rack::Response then self.new message
+      else
+        self.new message.to_s, 500, { 'Content-Type' => 'text/plain' }
+      end
+    end
+
+    # Returns itself if the message is nil. Otherwise it runs the
+    # class method with the message as its argument.
+    #
+    # @param message [nil, Rack::Response, #to_s] optional response
+    #  object or string
+    #
+    # @return [ForgetPasswords::ErrorResponse] a new error response
+    #
+    def exception message = nil
+      return self if message.nil?
+      self.class.exception message
+    end
+  end
 
   # This part is the actual Web application.
   #
@@ -27,11 +99,13 @@ module AdmitN
     # @return [Rack::Response] the response
     #
     def forward_to_checkout req
-      # generate a nonce to be associated with the checkout session
+      # if we aren't being forced, determine if the user is logged in
+      # or if the email supplied is a customer or beneficiary
 
-      # mint a new checkout session
-
-      # redirect to uri
+      begin
+        driver.initiator req
+      rescue AdmitN::ErrorResponse => e
+      end
     end
 
     # Receive the redirection from stripe
@@ -42,13 +116,10 @@ module AdmitN
     #
     def checkout_landing req
       # return 405 unless the method is GET
-      #
-      # get the nonce and the checkout session id
 
-      # only if we have beaten the webhook:
-      # * call out to API to verify payment success
-      #   (return 503 if reaching out to stripe fails)
-      # * enroll customer to auth database
+      uri = req_uri req
+
+      principal = driver.validate uri
 
       # obtain session cookie?
 
@@ -111,43 +182,52 @@ module AdmitN
 
       # return 415 if content type is not json
 
-      # return 401 if no stripe signature header
-
-      # return 403 if stripe signature is bad
-
-      # return 409 if payload is invalid
-
-      # return 202 if we don't handle this payload
-
-      # on `checkout.session.success`:
-      # only if we have beaten the landing page:
-      # * receive payment success notification
-      # * enroll customer into auth database
-
-      # on `checkout.session.expired`:
-      # * invalidate the nonce associated with the checkout session
-
-      # return 204 no content
+      driver.webhook req
     end
+
+    # This is all going to be replaced with Handler Manifest Protocol
+    # (when I finally sit down and design it), but the URL paths are
+    # specified in the config file and I wanted to put a second layer
+    # of indirection there between the configuration keys and the
+    # method names.
+    #
+    METHODS = {
+      initial_cta:    :forward_to_checkout,
+      already_in:     :sanity_check,
+      post_checkout:  :checkout_landing,
+      assign_confirm: :display_slots,
+      webhook:        :handle_webhook,
+    }
 
     public
 
-    attr_reader :state
+    attr_reader :state, :driver
 
     # Initialize the app.
     #
-    # @param state [AdmitN::State, #to_s]
-    # @param jwt [String]
-    # @param endpoints [Hash<Symbol, String>]
-    # @param urls [Hash<Symbol, String>]
+    # @param state [AdmitN::State, #to_s] DSN or database wrapper instance
+    # @param driver [Hash] Driver instance or spec
+    # @param jwt [String] JWT secret
+    # @param endpoints [Hash<Symbol, String>] Authentication service endpoints
+    # @param urls [Hash<Symbol, String>] URLs to resources under management
     #
     # @return [void]
     #
-    def initialize state, jwt: nil, endpoints: {},
-        urls: AdmitN::Types::URLConfig.value
+    def initialize state, jwt: nil, urls: AdmitN::Types::URLConfig.value, endpoints: {}
       @state     = state.is_a?(AdmitN::State) ? state : AdmitN::State.new(state)
       @endpoints = endpoints
       @urls      = urls
+      @mapping   = @urls.invert
+    end
+
+    # Return an absolute request-URI from the Rack::Request.
+    #
+    # @param req [Rack::Request] the request object
+    #
+    # @return [URI] the full URI.
+    #
+    def req_uri req
+      URI(req.base_url) + req.env['REQUEST_URI']
     end
 
     # Call the app through the {Rack} interface.
@@ -164,12 +244,18 @@ module AdmitN
 
       req  = Rack::Request.new env
       resp = Rack::Response[404]
+      uri  = req_uri req
+
+      # this is the method we call
+      meth = @mapping[uri.path] or return resp
 
       begin
-        # resp =
+        resp = send meth, req
+      rescue AdmitN::ErrorResponse => e
+        resp = e.response
       end
 
-      resp.finalize
+      resp.finish
     end
   end
 end

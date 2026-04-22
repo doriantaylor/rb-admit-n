@@ -58,6 +58,7 @@
             - after-confirmation redirect target (eg "content lobby" which is outside this module)
           - Web hook
         - [ ] Stripe credentials
+        - [ ] Auth module (~forget-passwords~) endpoint URIs
         - [ ] Anything else?
     - [-] Database adapter
       - [-] ORM

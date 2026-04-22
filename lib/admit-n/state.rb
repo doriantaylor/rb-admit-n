@@ -189,15 +189,15 @@ class AdmitN::State
         Time :added, null: false, default: S::CURRENT_TIMESTAMP
       },
     },
-    event_log: {
+    api_log: {
       # i dunno, we could probably infer this lol
-      class: %i[Event Log],
+      class: %i[API Log],
       model: -> {
         # is there anything in here??
       },
       create: -> {
         # our identifier
-        UUID :id, null: false, primary_key: { name: :pk_event_log }
+        UUID :id, null: false, primary_key: { name: :pk_api_log }
         # recorded on
         Time :logged, null: false, default: S::CURRENT_TIMESTAMP
         # passive (is webhook?)
@@ -206,9 +206,25 @@ class AdmitN::State
         JSON :message, null: false
       },
     },
+    session: {
+      model: -> {
+      }
+      create: -> {
+        UUID      :nonce,      null: false, primary_key: { name: :pk_session }
+        Integer   :vendor,     null: false
+        String    :remote_id,  null: false, text: true
+        Time      :created,    null: false, default: S::CURRENT_TIMESTAMP
+        Time      :expiration, null: false # should be set on creation
+        # whether the session was completed or expired
+        TrueClass :completed,  null: false, default: false
+
+        unique_key %i[vendor, remote_id], name: :uq_session_remote
+        constraint(:ck_session_vendor) { vendor > 0 }
+      },
+    },
     purchase: {
       model: -> {
-        one_to_one  :event_log
+        one_to_one  :session
         many_to_one :product
         many_to_one :customer
         one_to_many :assignment
@@ -231,7 +247,7 @@ class AdmitN::State
 
         constraint(:ck_purchase_quantity) { quantity > 0 }
 
-        foreign_key %i[id],       :event_log, name: :fk_purchase_event
+        foreign_key %i[id],       :api_log,   name: :fk_purchase_event
         foreign_key %i[customer], :customer,  name: :fk_purchase_customer
         foreign_key %i[product],  :product,   name: :fk_purchase_product
       },
